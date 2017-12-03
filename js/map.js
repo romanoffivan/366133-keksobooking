@@ -37,6 +37,12 @@ var CoordY = {
   MAX: 500
 };
 
+var AppartmentTypes = {
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalo: 'Бунгало'
+};
+
 var getRandomItem = function (array, remove) {
   var randomElementIndex = getRandomNum(0, array.length - 1);
   var randomElement = array[randomElementIndex];
@@ -63,19 +69,6 @@ var getRandomArray = function (array) {
 
 var getRandomNum = function (min, max) {
   return Math.floor(min + Math.random() * (max + 1 - min));
-};
-
-var generateOfferType = function (type) {
-  if (type === 'flat') {
-    var offerType = 'Квартира';
-  } else {
-    if (type === 'house') {
-      offerType = 'Дом';
-    } else {
-      offerType = 'Бунгало';
-    }
-  }
-  return offerType;
 };
 
 var generatePromo = function (i) {
@@ -156,7 +149,7 @@ var createAdvertisement = function (data) {
   offersElement.querySelector('h3').textContent = data.offer.title;
   offersElement.querySelector('p > small').textContent = data.offer.adress;
   offersElement.querySelector('.popup__price').innerHTML = data.offer.price + '&#x20bd;/ночь';
-  offersElement.querySelector('h4').textContent = generateOfferType(data.offer.type);
+  offersElement.querySelector('h4').textContent = AppartmentTypes[data.offer.type];
   offersElement.querySelector('h4 + p').textContent = 'комнаты: ' + data.offer.rooms + ' для ' + data.offer.guests + ' гостей';
   offersElement.querySelector('h4 + p + p').textContent = 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout;
   offersElement.querySelector('.popup__features + p').textContent = data.offer.description;
@@ -166,14 +159,14 @@ var createAdvertisement = function (data) {
   return offersElement;
 };
 
-var renderAdvertisements = function (obj) {
+var renderAdvertisements = function (array, index) {
   var mapFilter = document.querySelector('.map__filters-container');
 
-  map.insertBefore(createAdvertisement(obj), mapFilter);
+  map.insertBefore(createAdvertisement(array[index]), mapFilter);
 };
 
 var fillMap = function () {
-  renderAdvertisements(generatePromo(0));
+  renderAdvertisements(advertisments, 0);
   renderPins(advertisments);
 
   map.classList.remove('map--faded');
