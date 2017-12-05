@@ -1,4 +1,5 @@
 'use strict';
+var ESC_KEYCODE = 27;
 
 var OFFER_TITLES = [
   'Большая уютная квартира',
@@ -116,6 +117,8 @@ var advertisments = generateAdvertisements(MAX_OBJ);
 var map = document.querySelector('.map');
 var template = document.querySelector('template').content.querySelector('article.map__card');
 var pinTemplate = document.querySelector('template').content.querySelector('button.map__pin');
+var mapPins = document.querySelector('.map__pins');
+var fragment = document.createDocumentFragment();
 
 var createPin = function (data) {
   var pinElement = pinTemplate.cloneNode(true);
@@ -126,8 +129,6 @@ var createPin = function (data) {
 };
 
 var renderPins = function (pins) {
-  var fragment = document.createDocumentFragment();
-  var mapPins = document.querySelector('.map__pins');
   for (var i = 0; i < pins.length; i++) {
     fragment.appendChild(createPin(pins[i]));
   }
@@ -161,15 +162,113 @@ var createAdvertisement = function (data) {
 
 var renderAdvertisements = function (array, index) {
   var mapFilter = document.querySelector('.map__filters-container');
-
   map.insertBefore(createAdvertisement(array[index]), mapFilter);
 };
 
-var fillMap = function () {
-  renderAdvertisements(advertisments, 0);
-  renderPins(advertisments);
+var mainPin = document.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
+var popup = map.querySelector('.popup');
+var pinsList = fragment.querySelectorAll('.map__pin');
 
-  map.classList.remove('map--faded');
+var inputsDisable = function () {
+  for (var i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].disabled = true;
+  }
 };
 
-fillMap();
+var inputsEnable = function () {
+  for (var i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].disabled = false;
+  }
+};
+
+var closePopup = function () {
+  popup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEskPress);
+};
+
+var activatePin = function () {
+  var target = event.target;
+  var btn = target.closest('button');
+  if (!btn) {
+    return;
+  }
+  if (!mapPins.contains(btn)) {
+    return;
+  }
+  btn.classList.add('map__pin--active');
+};
+
+var deactivatePin = function () {
+  var target = event.target;
+  var btn = target.closest('button');
+  if (!btn) {
+    return;
+  }
+  for (var i = 0; i < pinsList.length; i++) {
+    if (mainPin.classList.contains('map__pin--active')) {
+      mainPin.classList.remove('map__pin--active');
+    }
+    if (pinsList[i].classList.contains('map__pin--active')) {
+      pinsList[i].classList.remove('map__pin--active');
+    }
+  }
+};
+
+var openPopup = function () {
+  var target = event.target;
+  var btn = target.closest('button');
+  if (!btn) {
+    return;
+  }
+  if (!mapPins.contains(btn)) {
+    return;
+  }
+  if (btn === mainPin) {
+    return;
+  }
+
+  for (var i = 0; i < pinsList.length; i++) {
+    if (btn === pinsList[i]) {
+      map.removeChild(popup);
+      var card = renderAdvertisements(advertisments, 0);
+      popup = card;
+      var popupClose = popup.querySelector('.popup__close');
+      popup.classList.remove('hidden');
+      popupClose.addEventListener('click', onPopupCloseClick);
+      document.addEventListener('keydown', onPopupEskPress);
+      return;
+    }
+  }
+};
+
+var onMainPinMouseup = function () {
+  map.classList.remove('map--faded');
+  renderPins(advertisments);
+  noticeForm.classList.remove('notice__form--disabled');
+  inputsEnable();
+};
+
+var onPopupEskPress = function (event) {
+  if (event.keyCode === ESC_KEYCODE) {
+    closePopup();
+    deactivatePin();
+  }
+};
+
+var onPopupCloseClick = function () {
+  closePopup();
+  deactivatePin();
+};
+
+var onPinClick = function () {
+  deactivatePin();
+  activatePin();
+  openPopup();
+};
+
+inputsDisable();
+closePopup();
+mapPins.addEventListener('click', onPinClick);
+mainPin.addEventListener('mouseup', onMainPinMouseup);
