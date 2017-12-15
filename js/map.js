@@ -2,6 +2,14 @@
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 
+var NOT_FOR_GUESTS_VALUE = '100';
+var MinPrices = {
+  'bungalo': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+
 var OFFER_TITLES = [
   'Большая уютная квартира',
   'Маленькая неуютная квартира',
@@ -237,12 +245,6 @@ inputsDisable();
 mainPin.addEventListener('mouseup', onMainPinMouseup);
 mainPin.addEventListener('keydown', onMainPinKeydown);
 
-var MinPrices = {
-  bungalo: '0',
-  flat: '1000',
-  house: '5000',
-  palace: '10000'
-};
 
 var userFormElem = document.querySelector('.notice__form');
 
@@ -254,33 +256,26 @@ var priceInputElem = userFormElem.querySelector('#price');
 
 var numOfRoomsSelectElem = userFormElem.querySelector('#room_number');
 var capacitySelectElem = userFormElem.querySelector('#capacity');
+var addressInput = userFormElem.querySelector('#address');
+
+var showAddress = function () {
+  var left = parseInt(getComputedStyle(mainPin).getPropertyValue('left'), 10);
+  var top = parseInt(getComputedStyle(mainPin).getPropertyValue('top'), 10);
+  addressInput.value = left + ' ' + top;
+};
 
 var syncSelectElemsValue = function (changedSelect, syncingSelect) {
-  var selectedValue = changedSelect.options[changedSelect.selectedIndex].value;
-
-  for (var i = 0; i < syncingSelect.length; i++) {
-    if (syncingSelect[i].value === selectedValue) {
-      syncingSelect[i].selected = true;
-      break;
-    }
-  }
+  syncingSelect.options[changedSelect.selectedIndex].selected = 'selected';
 };
 
-// поля не синхронизированы. не пойму в чем ошибка.
 var syncTypeWithMinPrice = function () {
-  var selectedType = typeSelectElem.options[typeSelectElem.selectedIndex].value;
-  priceInputElem.min = MinPrices[selectedType];
+  priceInputElem.min = MinPrices[typeSelectElem.value];
+  priceInputElem.placeholder = priceInputElem.min;
 };
 
-var NOT_FOR_GUESTS_VALUE = '100';
-
-var syncRoomsWithGuests = function () {
-  if (numOfRoomsSelectElem.options[numOfRoomsSelectElem.selectedIndex].value === NOT_FOR_GUESTS_VALUE) {
-    var notForGuestsOption = capacitySelectElem.querySelector('option[value="0"]');
-    notForGuestsOption.selected = true;
-  } else {
-    syncSelectElemsValue(numOfRoomsSelectElem, capacitySelectElem);
-  }
+var syncRoomsWithGuests = function (changedSelect, syncingSelect) {
+  var value = changedSelect.value;
+  syncingSelect.value = (value === NOT_FOR_GUESTS_VALUE) ? 0 : value;
 };
 
 var onUserFormElemChange = function (evt) {
@@ -297,10 +292,12 @@ var onUserFormElemChange = function (evt) {
       syncTypeWithMinPrice();
       break;
     case numOfRoomsSelectElem:
-      syncRoomsWithGuests();
+      syncRoomsWithGuests(numOfRoomsSelectElem, capacitySelectElem);
       break;
   }
 };
 
-syncRoomsWithGuests();
+syncTypeWithMinPrice();
+showAddress();
+syncRoomsWithGuests(numOfRoomsSelectElem, capacitySelectElem);
 userFormElem.addEventListener('change', onUserFormElemChange);
