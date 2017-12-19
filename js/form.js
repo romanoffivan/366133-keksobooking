@@ -11,6 +11,7 @@
   };
   var userFormElem = document.querySelector('.notice__form');
   var mainPin = document.querySelector('.map__pin--main');
+  var noticeFormFieldsets = userFormElem.querySelectorAll('fieldset');
 
   var checkinSelectElem = userFormElem.querySelector('#timein');
   var checkoutSelectElem = userFormElem.querySelector('#timeout');
@@ -21,6 +22,19 @@
   var numOfRoomsSelectElem = userFormElem.querySelector('#room_number');
   var capacitySelectElem = userFormElem.querySelector('#capacity');
   var addressInput = userFormElem.querySelector('#address');
+
+
+  var inputsDisable = function () {
+    for (var i = 0; i < noticeFormFieldsets.length; i++) {
+      noticeFormFieldsets[i].disabled = true;
+    }
+  };
+
+  var inputsEnable = function () {
+    for (var i = 0; i < noticeFormFieldsets.length; i++) {
+      noticeFormFieldsets[i].disabled = false;
+    }
+  };
 
   var showAddress = function () {
     var left = parseInt(getComputedStyle(mainPin).getPropertyValue('left'), 10);
@@ -65,4 +79,10 @@
   showAddress();
   syncRoomsWithGuests(numOfRoomsSelectElem, capacitySelectElem);
   userFormElem.addEventListener('change', onUserFormElemChange);
+  window.form = {
+    userFormElem: userFormElem,
+    inputsDisable: inputsDisable,
+    inputsEnable: inputsEnable,
+    showAddress: showAddress
+  };
 })();
