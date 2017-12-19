@@ -25,10 +25,9 @@
     hideAdvertCard();
     mapCard.insertBefore(advCard, mapFilter);
     advCard.querySelector('.popup__close').addEventListener('click', function () {
-      onClose();
       hideAdvertCard();
+      onClose();
     });
-    document.addEventListener('keydown', onPopupEskPress);
   };
 
   var hideAdvertCard = function (callback) {

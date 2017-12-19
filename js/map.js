@@ -40,6 +40,7 @@
     window.pin.deactivatePin();
     evt.currentTarget.classList.add('map__pin--active');
     window.card.showCard(advert, window.pin.deactivatePin);
+    document.addEventListener('keydown', onPopupEskPress);
   };
 
   var onMainPinMouseup = function () {
