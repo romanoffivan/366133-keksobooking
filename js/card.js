@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var mapCard = document.querySelector('.map');
+  var map = document.querySelector('.map');
   var template = document.querySelector('template').content.querySelector('article.map__card');
   var mapFilter = document.querySelector('.map__filters-container');
   var createAdvertisement = function (data) {
@@ -23,18 +23,18 @@
   var showCard = function (data, onClose) {
     var advCard = createAdvertisement(data);
     hideAdvertCard();
-    mapCard.insertBefore(advCard, mapFilter);
+    map.insertBefore(advCard, mapFilter);
     advCard.querySelector('.popup__close').addEventListener('click', function () {
       hideAdvertCard();
       onClose();
     });
   };
 
-  var hideAdvertCard = function (callback) {
+  var hideAdvertCard = function (clickHandler) {
     var popup = document.querySelector('.popup');
     if (popup) {
-      mapCard.removeChild(popup);
-      document.removeEventListener('keydown', callback);
+      map.removeChild(popup);
+      document.removeEventListener('keydown', clickHandler);
     }
   };
   window.card = {

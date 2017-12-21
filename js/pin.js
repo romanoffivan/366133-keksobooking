@@ -15,9 +15,9 @@
     return pinElement;
   };
 
-  var renderPins = function (pins, callback) {
+  var renderPins = function (pins, clickHandler) {
     for (var i = 0; i < pins.length; i++) {
-      fragment.appendChild(createPin(pins[i], callback));
+      fragment.appendChild(createPin(pins[i], clickHandler));
     }
 
     mapPins.appendChild(fragment);

@@ -1,13 +1,12 @@
 'use strict';
 
 (function () {
-
-  var NOT_FOR_GUESTS_VALUE = '100';
-  var MinPrices = {
-    'bungalo': 0,
-    'flat': 1000,
-    'house': 5000,
-    'palace': 10000
+  var FormFieldsParams = {
+    TIME_OPTIONS: ['12:00', '13:00', '14:00'],
+    ROOMS_OPTIONS: ['1', '2', '3', '100'],
+    GUESTS_OPTIONS: ['1', '2', '3', '0'],
+    APARTMENTS_OPTIONS: ['bungalo', 'flat', 'house', 'palace'],
+    PRICE_OPTIONS: [0, 1000, 5000, 10000]
   };
   var userFormElem = document.querySelector('.notice__form');
   var mainPin = document.querySelector('.map__pin--main');
@@ -42,18 +41,15 @@
     addressInput.value = left + ' ' + top;
   };
 
-  var syncSelectElemsValue = function (changedSelect, syncingSelect) {
-    syncingSelect.options[changedSelect.selectedIndex].selected = 'selected';
+  var syncValues = function (element, value) {
+    element.value = value;
   };
 
-  var syncTypeWithMinPrice = function () {
-    priceInputElem.min = MinPrices[typeSelectElem.value];
-    priceInputElem.placeholder = priceInputElem.min;
-  };
-
-  var syncRoomsWithGuests = function (changedSelect, syncingSelect) {
-    var value = changedSelect.value;
-    syncingSelect.value = (value === NOT_FOR_GUESTS_VALUE) ? 0 : value;
+  var syncValueWithMin = function (element, value) {
+    element.min = value;
+    if (element.placeholder) {
+      element.placeholder = value;
+    }
   };
 
   var onUserFormElemChange = function (evt) {
@@ -61,23 +57,21 @@
 
     switch (target) {
       case checkinSelectElem:
-        syncSelectElemsValue(checkinSelectElem, checkoutSelectElem);
+        window.synchronizeFields(checkinSelectElem, checkoutSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
         break;
       case checkoutSelectElem:
-        syncSelectElemsValue(checkoutSelectElem, checkinSelectElem);
+        window.synchronizeFields(checkinSelectElem, checkoutSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
         break;
       case typeSelectElem:
-        syncTypeWithMinPrice();
+        window.synchronizeFields(typeSelectElem, priceInputElem, FormFieldsParams.APARTMENTS_OPTIONS, FormFieldsParams.PRICE_OPTIONS, syncValueWithMin);
         break;
       case numOfRoomsSelectElem:
-        syncRoomsWithGuests(numOfRoomsSelectElem, capacitySelectElem);
+        window.synchronizeFields(numOfRoomsSelectElem, capacitySelectElem, FormFieldsParams.ROOMS_OPTIONS, FormFieldsParams.GUESTS_OPTIONS, syncValues);
         break;
     }
   };
 
-  syncTypeWithMinPrice();
   showAddress();
-  syncRoomsWithGuests(numOfRoomsSelectElem, capacitySelectElem);
   userFormElem.addEventListener('change', onUserFormElemChange);
   window.form = {
     userFormElem: userFormElem,
