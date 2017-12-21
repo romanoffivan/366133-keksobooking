@@ -98,8 +98,6 @@
 
     var onPinMouseUp = function () {
       mainPin.classList.remove('map__pin--active');
-
-      mainPin.style.cursor = 'move';
       document.removeEventListener('mousemove', onPinMouseMove);
       document.removeEventListener('mouseup', onPinMouseUp);
     };
