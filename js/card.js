@@ -8,7 +8,7 @@
     var offersElement = template.cloneNode(true);
 
     offersElement.querySelector('h3').textContent = data.offer.title;
-    offersElement.querySelector('p > small').textContent = data.offer.adress;
+    offersElement.querySelector('p > small').textContent = data.offer.address;
     offersElement.querySelector('.popup__price').innerHTML = data.offer.price + '&#x20bd;/ночь';
     offersElement.querySelector('h4').textContent = window.data.types[data.offer.type];
     offersElement.querySelector('h4 + p').textContent = 'комнаты: ' + data.offer.rooms + ' для ' + data.offer.guests + ' гостей';
@@ -20,17 +20,17 @@
     return offersElement;
   };
 
-  var showCard = function (data, onClose) {
+  var showAdvert = function (data, onClose) {
     var advCard = createAdvertisement(data);
-    hideAdvertCard();
+    hideAdvert();
     map.insertBefore(advCard, mapFilter);
     advCard.querySelector('.popup__close').addEventListener('click', function () {
-      hideAdvertCard();
+      hideAdvert();
       onClose();
     });
   };
 
-  var hideAdvertCard = function (clickHandler) {
+  var hideAdvert = function (clickHandler) {
     var popup = document.querySelector('.popup');
     if (popup) {
       map.removeChild(popup);
@@ -38,7 +38,7 @@
     }
   };
   window.card = {
-    showCard: showCard,
-    hideAdvertCard: hideAdvertCard
+    showAdvert: showAdvert,
+    hideAdvert: hideAdvert
   };
 })();

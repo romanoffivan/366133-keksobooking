@@ -11,6 +11,7 @@
   var userFormElem = document.querySelector('.notice__form');
   var mainPin = document.querySelector('.map__pin--main');
   var noticeFormFieldsets = userFormElem.querySelectorAll('fieldset');
+  var resetButton = userFormElem.querySelector('.form__reset');
 
   var checkinSelectElem = userFormElem.querySelector('#timein');
   var checkoutSelectElem = userFormElem.querySelector('#timeout');
@@ -21,6 +22,7 @@
   var numOfRoomsSelectElem = userFormElem.querySelector('#room_number');
   var capacitySelectElem = userFormElem.querySelector('#capacity');
   var addressInput = userFormElem.querySelector('#address');
+  var bodyElement = document.querySelector('body');
 
 
   var inputsDisable = function () {
@@ -52,6 +54,24 @@
     }
   };
 
+  var successHandler = function () {
+    var successPopup = window.popup.createSuccess();
+    bodyElement.appendChild(successPopup);
+    userFormElem.reset();
+  };
+
+  var errorHandler = function (errorMessage) {
+    var warning = window.popup.createWarning('К сожалению, форма не была отправлена. ' + errorMessage);
+    bodyElement.appendChild(warning);
+  };
+
+  var initializeForm = function () {
+    window.synchronizeFields(numOfRoomsSelectElem, capacitySelectElem, FormFieldsParams.ROOMS_OPTIONS, FormFieldsParams.GUESTS_OPTIONS, syncValues);
+    window.synchronizeFields(checkinSelectElem, checkoutSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
+    window.synchronizeFields(typeSelectElem, priceInputElem, FormFieldsParams.APARTMENTS_OPTIONS, FormFieldsParams.PRICE_OPTIONS, syncValueWithMin);
+    showAddress();
+  };
+
   var onUserFormElemChange = function (evt) {
     var target = evt.target;
 
@@ -60,7 +80,7 @@
         window.synchronizeFields(checkinSelectElem, checkoutSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
         break;
       case checkoutSelectElem:
-        window.synchronizeFields(checkinSelectElem, checkoutSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
+        window.synchronizeFields(checkoutSelectElem, checkinSelectElem, FormFieldsParams.TIME_OPTIONS, FormFieldsParams.TIME_OPTIONS, syncValues);
         break;
       case typeSelectElem:
         window.synchronizeFields(typeSelectElem, priceInputElem, FormFieldsParams.APARTMENTS_OPTIONS, FormFieldsParams.PRICE_OPTIONS, syncValueWithMin);
@@ -71,7 +91,17 @@
     }
   };
 
-  showAddress();
+  userFormElem.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(userFormElem), successHandler, errorHandler);
+    evt.preventDefault();
+  });
+  resetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    userFormElem.reset();
+    initializeForm();
+  });
+
+  initializeForm();
   userFormElem.addEventListener('change', onUserFormElemChange);
   window.form = {
     userFormElem: userFormElem,

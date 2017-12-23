@@ -12,12 +12,11 @@
     return randomElement;
   };
 
-  var getRandomArray = function (array) {
+  var getRandomArray = function (array, amount) {
     var randomArray = [];
-    var randomLength = getRandomNum(1, array.length);
     var copyArray = array.slice();
 
-    for (var i = 0; i < randomLength; i++) {
+    for (var i = 0; i < amount; i++) {
       var randomArrayElement = getRandomItem(copyArray, true);
       randomArray.push(randomArrayElement);
     }
@@ -30,8 +29,6 @@
   };
 
   window.utils = {
-    getRandomItem: getRandomItem,
-    getRandomArray: getRandomArray,
-    getRandomNum: getRandomNum
+    getRandomArray: getRandomArray
   };
 })();

@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-  var mapCard = document.querySelector('.map');
+  var MAX_OBJ = 5;
+  var map = document.querySelector('.map');
   var mainPin = document.querySelector('.map__pin--main');
 
   var MainPinParams = {
@@ -21,7 +22,17 @@
     TOP: LocationBorders.Y_MIN - pinOffsetY,
     BOTTOM: LocationBorders.Y_MAX - pinOffsetY,
     LEFT: 0,
-    RIGHT: mapCard.clientWidth
+    RIGHT: map.clientWidth
+  };
+
+  var successHandler = function (loadedData) {
+    var adverts = window.data.generateAdvertisements(loadedData);
+    window.pin.renderPins(window.utils.getRandomArray(adverts, MAX_OBJ), onPinClick);
+};
+
+  var errorHandler = function (errorMessage) {
+    var warning = window.popup.createWarning('Не удалось загрузить объявления. ' + errorMessage);
+    document.querySelector('body').appendChild(warning);
   };
 
   var onMainPinKeydown = function (evt) {
@@ -32,22 +43,15 @@
   var onPopupEskPress = function (evt) {
     if (evt.keyCode === window.data.escKey) {
       window.pin.deactivatePin();
-      window.card.hideAdvertCard(onPopupEskPress);
+      window.card.hideAdvert(onPopupEskPress);
     }
   };
 
   var onPinClick = function (advert, evt) {
     window.pin.deactivatePin();
     evt.currentTarget.classList.add('map__pin--active');
-    window.card.showCard(advert, window.pin.deactivatePin);
+    window.card.showAdvert(advert, window.pin.deactivatePin);
     document.addEventListener('keydown', onPopupEskPress);
-  };
-
-  var onMainPinMouseup = function () {
-    mapCard.classList.remove('map--faded');
-    window.pin.renderPins(window.data.advertisments, onPinClick);
-    window.form.userFormElem.classList.remove('notice__form--disabled');
-    window.form.inputsEnable();
   };
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -106,7 +110,13 @@
     document.addEventListener('mousemove', onPinMouseMove);
     document.addEventListener('mouseup', onPinMouseUp);
   });
-
+  var onMainPinMouseup = function () {
+    map.classList.remove('map--faded');
+    window.form.userFormElem.classList.remove('notice__form--disabled');
+    window.backend.load(successHandler, errorHandler);
+    window.form.inputsEnable();
+    mainPin.removeEventListener('mouseup', onMainPinMouseup);
+  };
   window.form.inputsDisable();
   mainPin.addEventListener('mouseup', onMainPinMouseup);
   mainPin.addEventListener('keydown', onMainPinKeydown);
